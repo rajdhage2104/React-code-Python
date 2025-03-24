@@ -14,7 +14,7 @@ on:
 
 # Environment variables
 env:
-  AWS_REGION: {{ secrets.AWS_REGION }} # Change to your preferred region
+  AWS_REGION: ${{ secrets.AWS_REGION }} # Change to your preferred region
   S3_BUCKET: react-app-bucket-raj # Change to your bucket name
 
 # Permissions for OIDC authentication
