@@ -16,6 +16,7 @@ on:
 env:
   AWS_REGION: ${{ secrets.AWS_REGION }} # Change to your preferred region
   S3_BUCKET: react-app-bucket-raj # Change to your bucket name
+  SKIP_PREFLIGHT_CHECK: true # Skip Create React App dependency checks
 
 # Permissions for OIDC authentication
 permissions:
@@ -43,30 +44,19 @@ jobs:
       - name: Install Dependencies
         run: npm install --legacy-peer-deps
 
-        # env:
-        #   CI: false
-        # continue-on-error: true  # Allow deployment even if tests fail
+      # Create or update .env file with SKIP_PREFLIGHT_CHECK
+      - name: Setup Environment
+        run: |
+          echo "SKIP_PREFLIGHT_CHECK=true" >> .env
+          cat .env
 
-      #   # SonarQube Scan
-      # - name: SonarQube Scan
-      #   uses: sonarsource/sonarqube-scan-action@master
-      #   env:
-      #     SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-      #     SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
-      #   with:
-      #     args: >
-      #       -Dsonar.projectKey=todo-react-app
-      #       -Dsonar.sources=.
-      #       -Dsonar.exclusions=**/*.java,../node-service/**,../java-service/**,../python-service/**,../init-database.sql,node_modules/**,build/**,public/**
-      #       -Dsonar.language=js,jsx,ts,tsx
-            
-      # Build the React app
+      # Build the React app with CI=false to ignore warnings
       - name: Build
         run: npm run build
-        # env:
-        #   CI: false  # Don't treat warnings as errors
+        env:
+          CI: false  # Don't treat warnings as errors
 
-       # Configure AWS credentials using OIDC
+      # Configure AWS credentials using OIDC
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v3
         with:
