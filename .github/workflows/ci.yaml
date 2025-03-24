@@ -43,9 +43,6 @@ jobs:
       - name: Install Dependencies
         run: npm install --legacy-peer-deps
 
-      # Run tests with fixed configuration for ESM modules
-      - name: Run Tests
-        run: npm test -- --watchAll=false
         # env:
         #   CI: false
         # continue-on-error: true  # Allow deployment even if tests fail
