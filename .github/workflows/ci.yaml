@@ -25,9 +25,6 @@ permissions:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./
     
     steps:
       # Checkout code
@@ -42,15 +39,15 @@ jobs:
           cache: 'npm'
           cache-dependency-path: './package-lock.json'
 
-      # Install dependencies
+      # Install dependencies with legacy-peer-deps to handle @material-ui/core with React 18
       - name: Install Dependencies
-        run: npm install
+        run: npm install --legacy-peer-deps
 
       # Run tests with fixed configuration for ESM modules
       - name: Run Tests
         run: npm test -- --watchAll=false
-        env:
-          CI: false
+        # env:
+        #   CI: false
         # continue-on-error: true  # Allow deployment even if tests fail
 
       #   # SonarQube Scan
