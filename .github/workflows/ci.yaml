@@ -53,8 +53,8 @@ jobs:
       # Build the React app with CI=false to ignore warnings
       - name: Build
         run: npm run build
-        env:
-          CI: false  # Don't treat warnings as errors
+        # env:
+        #   CI: false  # Don't treat warnings as errors
 
       # Configure AWS credentials using OIDC
       - name: Configure AWS credentials
@@ -66,7 +66,6 @@ jobs:
 
       # Sync build folder to S3
       - name: Deploy to S3
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch'
         run: |
           aws s3 sync ./build/ s3://${{ env.S3_BUCKET }}/ \
             --delete \
