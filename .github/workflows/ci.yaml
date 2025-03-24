@@ -5,8 +5,6 @@ name: React Frontend CI/CD Pipeline
 
 # Trigger on push to main branch or pull requests
 on:
-  # Manual trigger
-  workflow_dispatch:
   push:
     branches:
       - main
