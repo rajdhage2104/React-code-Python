@@ -50,12 +50,6 @@ jobs:
         run: |
           echo "SKIP_PREFLIGHT_CHECK=true" >> .env
           cat .env
-          
-      # Check for React components that might be missing the React import
-      - name: Check React Imports
-        run: |
-          echo "Checking for React components that might be missing the React import..."
-          grep -l -r --include="*.js" --include="*.jsx" -E "<[A-Z]|<[a-z]" ./src | xargs grep -L "import React" || echo "All components have React import"
 
       # Build the React app
       - name: Build
@@ -73,22 +67,4 @@ jobs:
       - name: Deploy to S3
         run: |
           aws s3 sync --delete ./build/ s3://${{ env.S3_BUCKET }}
-          
-      
-      # # Create CloudFront invalidation
-      # - name: Invalidate CloudFront
-      #   if: env.CLOUDFRONT_DISTRIBUTION_ID != ''
-      #   run: |
-      #     aws cloudfront create-invalidation \
-      #       --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} \
-      #       --paths "/*"
-            
-      # # Note about accessing the website
-      # - name: Website Access Information
-      #   run: |
-      #     echo "================================================================="
-      #     echo "Deployment complete! To access your website:"
-      #     echo "1. If using CloudFront, your website will be available at your CloudFront domain"
-      #     echo "   (e.g., https://d1234abcd.cloudfront.net)"
-      #     echo "2. If using S3 directly, configure static website hosting in the S3 console"
-      #     echo "================================================================="
+  
