@@ -50,13 +50,16 @@ jobs:
         run: |
           echo "SKIP_PREFLIGHT_CHECK=true" >> .env
           cat .env
+          
+      # Check for React components that might be missing the React import
+      - name: Check React Imports
+        run: |
+          echo "Checking for React components that might be missing the React import..."
+          grep -l -r --include="*.js" --include="*.jsx" -E "<[A-Z]|<[a-z]" ./src | xargs grep -L "import React" || echo "All components have React import"
 
       # Build the React app with CI=false to ignore warnings
       - name: Build
         run: npm run build
-        # env:
-        #   CI: false  # Don't treat warnings as errors
-        #   NODE_OPTIONS: --openssl-legacy-provider # Ensure this is set for the build step
 
       # Configure AWS credentials using OIDC
       - name: Configure AWS credentials
