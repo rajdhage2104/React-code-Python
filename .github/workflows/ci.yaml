@@ -15,9 +15,9 @@ on:
 # Environment variables
 env:
   AWS_REGION: ${{ secrets.AWS_REGION }} # Change to your preferred region
-  S3_BUCKET: react-app-bucket-raj # Change to your bucket name
+  S3_BUCKET: react-app-bucket-raj1 # Change to your bucket name
   SKIP_PREFLIGHT_CHECK: true # Skip Create React App dependency checks
-  # NODE_OPTIONS: --openssl-legacy-provider # Fix for OpenSSL issues with Node.js >= 17
+  CLOUDFRONT_DISTRIBUTION_ID: ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }}
 
 # Permissions for OIDC authentication
 permissions:
@@ -57,7 +57,7 @@ jobs:
           echo "Checking for React components that might be missing the React import..."
           grep -l -r --include="*.js" --include="*.jsx" -E "<[A-Z]|<[a-z]" ./src | xargs grep -L "import React" || echo "All components have React import"
 
-      # Build the React app with CI=false to ignore warnings
+      # Build the React app
       - name: Build
         run: npm run build
 
@@ -84,3 +84,21 @@ jobs:
             --cache-control "no-store, no-cache, must-revalidate" \
             --include "*.html" \
             --include "service-worker.js"
+      
+      # Create CloudFront invalidation
+      - name: Invalidate CloudFront
+        if: env.CLOUDFRONT_DISTRIBUTION_ID != ''
+        run: |
+          aws cloudfront create-invalidation \
+            --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} \
+            --paths "/*"
+            
+      # Note about accessing the website
+      - name: Website Access Information
+        run: |
+          echo "================================================================="
+          echo "Deployment complete! To access your website:"
+          echo "1. If using CloudFront, your website will be available at your CloudFront domain"
+          echo "   (e.g., https://d1234abcd.cloudfront.net)"
+          echo "2. If using S3 directly, configure static website hosting in the S3 console"
+          echo "================================================================="
