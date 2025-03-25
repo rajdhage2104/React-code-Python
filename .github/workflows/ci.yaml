@@ -17,6 +17,7 @@ env:
   AWS_REGION: ${{ secrets.AWS_REGION }} # Change to your preferred region
   S3_BUCKET: react-app-bucket-raj # Change to your bucket name
   SKIP_PREFLIGHT_CHECK: true # Skip Create React App dependency checks
+  NODE_OPTIONS: --openssl-legacy-provider # Fix for OpenSSL issues with Node.js >= 17
 
 # Permissions for OIDC authentication
 permissions:
@@ -32,11 +33,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      # Setup Node.js
+      # Setup Node.js - using Node.js 16 for better compatibility with older React apps
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '22' # Latest LTS version as of March 2025
+          node-version: '16' # Using Node.js 16 for better compatibility
           cache: 'npm'
           cache-dependency-path: './package-lock.json'
 
@@ -53,8 +54,9 @@ jobs:
       # Build the React app with CI=false to ignore warnings
       - name: Build
         run: npm run build
-        # env:
-        #   CI: false  # Don't treat warnings as errors
+        env:
+          CI: false  # Don't treat warnings as errors
+          NODE_OPTIONS: --openssl-legacy-provider # Ensure this is set for the build step
 
       # Configure AWS credentials using OIDC
       - name: Configure AWS credentials
